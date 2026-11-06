@@ -1,0 +1,53 @@
+# Experiment configuration for benchmark evaluations and ablation studies
+
+scenarios:
+  # Experiment A: Baseline comparison
+  baseline_comparison:
+    episodes: 5
+    seeds: [42, 101, 202, 303, 404]
+    algorithms: ["random", "greedy", "rule_based", "shellmean_mappo"]
+
+  # Experiment B: Scalability (satellite count variations)
+  scalability:
+    network_sizes:
+      small:
+        num_satellites: 4
+        satellites_per_shell: [2, 2]
+        num_ground_cells: 10
+      medium:
+        num_satellites: 8
+        satellites_per_shell: [4, 4]
+        num_ground_cells: 20
+      large:
+        num_satellites: 12
+        satellites_per_shell: [6, 6]
+        num_ground_cells: 30
+
+  # Experiment C: Ablation study
+  ablation:
+    variants:
+      - name: "Full_ShellMean_MAPPO"
+        use_shell_summaries: true
+        use_autoregressive: true
+        use_counterfactual_credit: true
+      - name: "No_Shell_Summaries"
+        use_shell_summaries: false
+        use_autoregressive: true
+        use_counterfactual_credit: true
+      - name: "No_Autoregressive"
+        use_shell_summaries: true
+        use_autoregressive: false
+        use_counterfactual_credit: true
+      - name: "No_Counterfactual_Credit"
+        use_shell_summaries: true
+        use_autoregressive: true
+        use_counterfactual_credit: false
+
+  # Experiment D: Traffic sensitivity
+  traffic_sensitivity:
+    arrival_multipliers: [0.5, 1.0, 1.5, 2.0]
+
+  # Experiment E: Interference sensitivity
+  interference_sensitivity:
+    rb_counts: [4, 8, 16]
+

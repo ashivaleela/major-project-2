@@ -1,0 +1,77 @@
+# Default configuration for ShellMean-MAPPO
+# Conflict-Aware MARL Framework for Downlink Resource Allocation in Multi-Shell LEO Networks
+
+network:
+  num_satellites: 8
+  num_shells: 2
+  satellites_per_shell: [4, 4]
+  beams_per_satellite: 2
+  num_ground_cells: 20
+  num_resource_blocks: 8
+  rb_bandwidth_mhz: 25.0           # MHz per resource block (Total 200 MHz)
+  carrier_frequency_ghz: 20.0      # Ka-band downlink (20 GHz)
+  time_step_sec: 1.0               # Slot duration Delta t = 1.0 second
+  episode_length: 100              # Scheduling slots per episode
+
+orbit:
+  # Shell 0: Low LEO; Shell 1: High LEO
+  shell_altitudes_km: [550.0, 1100.0]
+  inclination_deg: [53.0, 70.0]
+  min_elevation_deg: 25.0          # Minimum elevation angle for visibility
+  satellite_tx_power_w: 40.0       # Max power budget per satellite P_max (40 W = 46 dBm)
+  satellite_antenna_gain_dbi: 32.0 # Sat transmit beam peak gain
+  ground_antenna_gain_dbi: 38.0    # Ground cell parabolic receiver gain
+  noise_temperature_k: 350.0       # Effective system noise temperature
+  implementation_efficiency: 0.85  # Practical Shannon gap / modulation efficiency
+
+traffic:
+  hotspot_cell_ratio: 0.25         # 25% of cells are hotspots
+  hotspot_arrival_rate_mbps: 12.0  # Mean arrival rate for hotspot cells
+  regular_arrival_rate_mbps: 3.5   # Mean arrival rate for regular cells
+  burst_probability: 0.15          # Probability of burst arrival
+  burst_multiplier: 2.5            # Multiplier on arrival during burst
+  initial_queue_max_mb: 30.0       # Max initial queue backlog
+  max_queue_capacity_mb: 200.0     # Maximum queue buffer size
+  arrival_distribution: "poisson"  # Options: poisson, bursty
+
+conflict_resolution:
+  m_c_max: 2                       # Max simultaneous serving beams per cell
+  q_seg_mb: 12.0                   # Backlog segmentation threshold Q_seg (Mb)
+  weight_channel: 1.0              # Score weight for normalized channel gain
+  weight_power: 0.8                # Score weight for committed power share
+  weight_queue: 1.2                # Score weight for queue urgency
+  weight_delay: 0.5                # Score penalty weight for shell propagation delay
+
+rewards:
+  w_throughput: 1.0                # Weight for delivered data (Mb)
+  w_queue: 0.05                    # Penalty weight for remaining queue backlog
+  w_interference: 0.02             # Penalty weight for co-channel interference
+  w_conflict: 0.5                  # Penalty weight for rejected conflicting requests
+  w_switching: 0.1                 # Penalty weight for beam retargeting / switching
+  w_fairness: 2.0                  # Bonus weight for Jain's fairness index
+  use_counterfactual_credit: true  # Whether to use replay counterfactual credit
+
+mappo:
+  hidden_dim: 128
+  actor_lr: 0.0003
+  critic_lr: 0.001
+  gamma: 0.99
+  gae_lambda: 0.95
+  clip_param: 0.2
+  value_loss_coef: 0.5
+  entropy_coef: 0.01
+  max_grad_norm: 0.5
+  ppo_epochs: 4
+  mini_batch_size: 64
+  rollout_steps: 128
+
+experiment:
+  seed: 42
+  eval_seeds: [42, 101, 202, 303, 404]
+  eval_episodes: 5
+  log_interval: 10
+  save_interval: 50
+  checkpoint_dir: "checkpoints"
+  results_dir: "results"
+  logs_dir: "logs"
+
